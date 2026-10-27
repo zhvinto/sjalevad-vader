@@ -137,10 +137,9 @@ def make_feed(forecast):
         item = ET.SubElement(channel, "item")
         ET.SubElement(item, "title").text = f"{emoji} {label} – {temperature}"
 
-        if label == "Imorgon":
-            weather_description = f"{description} · Temperatur kl. 12.00: {temperature}"
-        else:
-            weather_description = f"{description} · Nuvarande temperatur: {temperature}"
+
+        weather_description = f"{description} · {temperature}"
+
 
         ET.SubElement(item, "description").text = weather_description
 
