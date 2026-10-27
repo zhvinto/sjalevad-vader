@@ -1,10 +1,11 @@
 
 import json
 import os
-import re
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import datetime
+
+from datetime import datetime, timedelta
 from email.utils import format_datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -14,104 +15,121 @@ MENU_URL = (
     "68b52fddced7b30d63498017_sjalevadskolan"
 )
 
+API_URL = "https://menu.matildaplatform.com/api/menu"
 TIMEZONE = ZoneInfo("Europe/Stockholm")
-TODAY = datetime.now(TIMEZONE).date()
 OUTPUT = Path(os.environ.get("RSS_OUTPUT", "docs/lunch.xml"))
 
 
 def fetch_menu():
+    today = datetime.now(TIMEZONE).date()
+
+    # Hämta innevarande vecka och nästa vecka.
+    start_date = today - timedelta(days=today.weekday())
+    end_date = start_date + timedelta(days=13)
+
+    # Hämta distributörens ID från den publika menyadressen.
+    distributor_id = MENU_URL.rstrip("/").split("/")[-1].split("_")[0]
+
+    params = urllib.parse.urlencode({
+        "distributorId": distributor_id,
+        "startDate": start_date.isoformat(),
+        "endDate": end_date.isoformat(),
+        "lang": "sv",
+    })
+
     request = urllib.request.Request(
-        MENU_URL,
-        headers={"User-Agent": "SjalevadskolanLunchRSS/1.0"},
+        f"{API_URL}?{params}",
+        headers={
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json",
+        },
     )
+
     with urllib.request.urlopen(request, timeout=30) as response:
-        html = response.read().decode("utf-8")
+        data = json.loads(response.read().decode("utf-8"))
 
-    match = re.search(
-        r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>',
-        html,
-        re.DOTALL,
-    )
-    if not match:
-        raise RuntimeError("Hittade inte Matildas menydata i webbsidan.")
+    if not isinstance(data.get("meals"), list):
+        raise RuntimeError("Matilda returnerade inget giltigt menyformat.")
 
-    data = json.loads(match.group(1))
-    return data["props"]["pageProps"]["meals"]
+    return data["meals"]
 
 
-def get_dishes(meals):
+def get_todays_dishes(meals):
+    today = datetime.now(TIMEZONE).date()
     dishes = []
 
-    def walk(value):
-        if isinstance(value, dict):
-            date_value = value.get("date")
-            if isinstance(date_value, str) and date_value[:10] == str(TODAY):
-                name = value.get("name")
-                if isinstance(name, str) and name.strip():
-                    dishes.append(name.strip())
+    for meal in meals:
+        date_text = meal.get("date", "")
 
-                courses = value.get("courses", [])
-                if isinstance(courses, list):
-                    for course in courses:
-                        if isinstance(course, dict):
-                            course_name = course.get("name")
-                            if isinstance(course_name, str) and course_name.strip():
-                                dishes.append(course_name.strip())
-                return
+        try:
+            meal_date = datetime.fromisoformat(date_text).date()
+        except (ValueError, TypeError):
+            continue
 
-            for child in value.values():
-                walk(child)
+        if meal_date != today:
+            continue
 
-        elif isinstance(value, list):
-            for child in value:
-                walk(child)
+        for course in meal.get("courses", []):
+            name = course.get("name")
 
-    walk(meals)
+            if isinstance(name, str) and name.strip():
+                dishes.append(name.strip())
 
-    # Ta bort eventuella dubbletter och behåll ordningen.
+    # Ta bort dubbletter men behåll ordningen.
     return list(dict.fromkeys(dishes))
 
 
 def create_rss(dishes):
+    now = datetime.now(TIMEZONE)
+    today = now.date()
+
     rss = ET.Element("rss", version="2.0")
     channel = ET.SubElement(rss, "channel")
 
-    ET.SubElement(channel, "title").text = (
-        "Dagens lunch – Själevadskolan"
-    )
+    ET.SubElement(channel, "title").text = "Dagens lunch"
     ET.SubElement(channel, "link").text = MENU_URL
     ET.SubElement(channel, "description").text = (
-        "Dagens lunch från Själevadskolan i Matilda Menu."
+        "Dagens lunchmeny."
     )
     ET.SubElement(channel, "language").text = "sv-se"
-    ET.SubElement(channel, "lastBuildDate").text = format_datetime(
-        datetime.now(TIMEZONE)
+    ET.SubElement(channel, "lastBuildDate").text = format_datetime(now)
+
+    if not dishes:
+        raise RuntimeError(
+            f"Inga maträtter hittades för {today}. "
+            "RSS-filen lämnas oförändrad."
+        )
+
+    item = ET.SubElement(channel, "item")
+
+    ET.SubElement(item, "title").text = (
+        f"Dagens lunch {today.strftime('%Y-%m-%d')}"
     )
-
-    if dishes:
-        item = ET.SubElement(channel, "item")
-        ET.SubElement(item, "title").text = (
-            f"Dagens lunch {TODAY.strftime('%Y-%m-%d')}"
-        )
-        ET.SubElement(item, "description").text = "\n".join(dishes)
-        ET.SubElement(item, "link").text = MENU_URL
-        ET.SubElement(item, "guid", isPermaLink="false").text = (
-            f"sjalevadskolan-lunch-{TODAY}"
-        )
-        ET.SubElement(item, "pubDate").text = format_datetime(
-            datetime.now(TIMEZONE)
-        )
-
-    else:
-        print(f"Ingen maträtt hittades för {TODAY}.")
+    ET.SubElement(item, "description").text = "\n".join(dishes)
+    ET.SubElement(item, "link").text = MENU_URL
+    ET.SubElement(item, "guid", isPermaLink="false").text = (
+        f"dagens-lunch-{today.isoformat()}"
+    )
+    ET.SubElement(item, "pubDate").text = format_datetime(now)
 
     ET.indent(rss, space="  ")
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+
+    temp_output = OUTPUT.with_suffix(".tmp")
     ET.ElementTree(rss).write(
-        OUTPUT, encoding="utf-8", xml_declaration=True
+        temp_output,
+        encoding="utf-8",
+        xml_declaration=True,
     )
+    temp_output.replace(OUTPUT)
+
     print(f"RSS uppdaterat: {OUTPUT}")
+    print("Dagens maträtter:")
+    for dish in dishes:
+        print(f"- {dish}")
 
 
 if __name__ == "__main__":
-    create_rss(get_dishes(fetch_menu()))
+    menu = fetch_menu()
+    dishes = get_todays_dishes(menu)
+    create_rss(dishes)
