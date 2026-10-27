@@ -1,130 +1,95 @@
 
-import json
-import urllib.request
-import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
-from email.utils import format_datetime
-from pathlib import Path
-
-# Ungefärliga koordinater för Själevad.
-LAT = 63.29
-LON = 18.59
-
-API_URL = (
-    "https://opendata-download-metfcst.smhi.se/api/"
-    f"category/snow1g/version/1/geotype/point/lon/{LON}/lat/{LAT}/data.json"
-)
-
-TZ = ZoneInfo("Europe/Stockholm")
-OUTPUT = Path("docs/feed.xml")
-
-
-def fetch_forecast():
-    request = urllib.request.Request(
-        API_URL,
-        headers={"User-Agent": "SjalevadWeatherRSS/1.0"}
-    )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return json.loads(response.read().decode("utf-8"))
-
-
-def get_value(data, key):
-    value = data.get(key)
-    if isinstance(value, (int, float)):
-        return value
-    return None
-
-
 def make_feed(forecast):
     now = datetime.now(timezone.utc)
-    days = {}
+    local_now = now.astimezone(TZ)
+    today = local_now.date()
+    tomorrow = today + timedelta(days=1)
 
-    for item in forecast.get("timeSeries", []):
+    points = []
+
+    for point in forecast.get("timeSeries", []):
         timestamp = datetime.fromisoformat(
-            item["time"].replace("Z", "+00:00")
+            point["time"].replace("Z", "+00:00")
         )
-        if timestamp < now:
-            continue
+        points.append((timestamp, point.get("data", {})))
 
-        local_time = timestamp.astimezone(TZ)
-        day_key = local_time.date().isoformat()
-        data = item.get("data", {})
+    points.sort(key=lambda p: p[0])
 
-        day = days.setdefault(day_key, {
-            "date": local_time.date(),
-            "temps": [],
-            "winds": [],
-            "rain_probs": [],
-            "hours": 0,
-        })
+    # Närmaste prognostimme till aktuell tid.
+    current_point = min(
+        points,
+        key=lambda p: abs((p[0] - now).total_seconds()),
+        default=None
+    )
 
-        temp = get_value(data, "air_temperature")
-        wind = get_value(data, "wind_speed")
-        rain = get_value(data, "probability_of_precipitation")
+    # Prognosen för morgondagen kl. 12 svensk tid.
+    target = datetime.combine(
+        tomorrow, datetime.min.time(), TZ
+    ).replace(hour=12)
 
-        if temp is not None:
-            day["temps"].append(temp)
-        if wind is not None:
-            day["winds"].append(wind)
-        if rain is not None:
-            day["rain_probs"].append(rain)
-
-        day["hours"] += 1
+    tomorrow_point = min(
+        (p for p in points if p[0].astimezone(TZ).date() == tomorrow),
+        key=lambda p: abs(
+            (p[0].astimezone(TZ) - target).total_seconds()
+        ),
+        default=None
+    )
 
     root = ET.Element("rss", version="2.0")
     channel = ET.SubElement(root, "channel")
-
-    ET.SubElement(channel, "title").text = "Vädret i Själevad"
-    ET.SubElement(channel, "link").text = (
-        "https://www.smhi.se/vader"
-    )
+    ET.SubElement(channel, "title").text = "Väder i Själevad"
+    ET.SubElement(channel, "link").text = "https://www.smhi.se/vader"
     ET.SubElement(channel, "description").text = (
-        "Dagsprognoser för Själevad baserade på SMHI:s öppna väderdata."
+        "Aktuell temperatur och morgondagens temperatur kl. 12.00 "
+        "i Själevad, med vädersymboler och nederbörd från SMHI."
     )
     ET.SubElement(channel, "language").text = "sv-se"
-    ET.SubElement(channel, "lastBuildDate").text = format_datetime(
-        now
-    )
+    ET.SubElement(channel, "lastBuildDate").text = format_datetime(now)
 
-    for day_key, day in sorted(days.items())[:10]:
-        date_text = day["date"].strftime("%A %d %B %Y")
-        details = []
+    entries = [
+        ("Just nu", current_point),
+        ("Imorgon kl. 12.00", tomorrow_point),
+    ]
 
-        if day["temps"]:
-            details.append(
-                f"Temperatur: {min(day['temps']):.1f} till "
-                f"{max(day['temps']):.1f} °C"
-            )
-        if day["winds"]:
-            details.append(
-                f"Vind: som mest {max(day['winds']):.1f} m/s"
-            )
-        if day["rain_probs"]:
-            details.append(
-                "Sannolikhet för nederbörd: som högst "
-                f"{max(day['rain_probs']):.0f} %"
-            )
+    for label, point in entries:
+        if point is None:
+            continue
 
-        if not details:
-            details.append("Inga vädervärden tillgängliga.")
+        timestamp, data = point
+        temp = valid_number(data.get("air_temperature"))
+        rain = valid_number(
+            data.get("precipitation_amount_mean_deterministic")
+        )
+        symbol_code = valid_number(data.get("symbol_code"))
+
+        emoji, description = WEATHER.get(
+            int(symbol_code) if symbol_code is not None else 0,
+            ("🌡️", "Väderprognos")
+        )
+
+        temperature = (
+            f"{temp:.1f} °C" if temp is not None else "Uppgift saknas"
+        )
+        precipitation = (
+            f"{max(0, rain):.1f} mm per prognosperiod"
+            if rain is not None else "Uppgift saknas"
+        )
 
         item = ET.SubElement(channel, "item")
-        title = f"Väder i Själevad – {date_text}"
-        ET.SubElement(item, "title").text = title
-        ET.SubElement(item, "description").text = " | ".join(details)
-        ET.SubElement(item, "guid", isPermaLink="false").text = (
-            f"sjalevad-weather-{day_key}"
+        ET.SubElement(item, "title").text = f"{emoji} {label} – {temperature}"
+        ET.SubElement(item, "description").text = (
+            f"🌡️ Temperatur: {temperature}. "
+            f"🌧️ Nederbörd: {precipitation}. "
+            f"Väder: {description}. "
+            f"Prognostid: {timestamp.astimezone(TZ).strftime('%Y-%m-%d %H:%M')}. "
+            "Källa: SMHI."
         )
-        ET.SubElement(item, "pubDate").text = format_datetime(now)
+        ET.SubElement(item, "guid", isPermaLink="false").text = (
+            f"sjalevad-{label.lower().replace(' ', '-')}-{today.isoformat()}"
+        )
+        ET.SubElement(item, "pubDate").text = format_datetime(timestamp)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     tree = ET.ElementTree(root)
     ET.indent(tree, space="  ")
     tree.write(OUTPUT, encoding="utf-8", xml_declaration=True)
-
-
-if __name__ == "__main__":
-    make_feed(fetch_forecast())
-    print(f"RSS-flödet har skapats: {OUTPUT}")
-
