@@ -5,17 +5,17 @@
     <link>https://www.smhi.se/vader</link>
     <description>Temperatur just nu och i morgon kl. 12.00 samt nederbörd. Prognos från SMHI.</description>
     <language>sv-se</language>
-    <lastBuildDate>Tue, 27 Oct 2026 10:25:26 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 27 Oct 2026 10:37:19 +0000</lastBuildDate>
     <item>
-      <title>☁️ Just nu – 7.9 °C</title>
-      <description>🌡️ Temperatur: 7.9 °C. 🌧️ Nederbörd: 0.0 mm per prognosperiod. Väder: Mulet. Prognostid: 2026-10-27 12:00. Källa: SMHI.</description>
-      <guid isPermaLink="false">sjalevad-just-nu-2026-10-27</guid>
+      <title>☁️ Idag – 7.9 °C</title>
+      <description>Mulet</description>
+      <guid isPermaLink="false">sjalevad-idag-2026-10-27</guid>
       <pubDate>Tue, 27 Oct 2026 11:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>☀️ Imorgon kl. 12.00 – 11.6 °C</title>
-      <description>🌡️ Temperatur: 11.6 °C. 🌧️ Nederbörd: 0.0 mm per prognosperiod. Väder: Klart. Prognostid: 2026-10-28 12:00. Källa: SMHI.</description>
-      <guid isPermaLink="false">sjalevad-imorgon-kl.-12.00-2026-10-27</guid>
+      <title>☀️ Imorgon – 11.6 °C</title>
+      <description>Klart</description>
+      <guid isPermaLink="false">sjalevad-imorgon-2026-10-27</guid>
       <pubDate>Wed, 28 Oct 2026 11:00:00 +0000</pubDate>
     </item>
   </channel>
