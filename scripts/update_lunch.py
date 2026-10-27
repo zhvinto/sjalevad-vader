@@ -16,7 +16,7 @@ MENU_URL = (
 
 TIMEZONE = ZoneInfo("Europe/Stockholm")
 TODAY = datetime.now(TIMEZONE).date()
-OUTPUT = Path(os.environ.get("RSS_OUTPUT", "lunch.xml"))
+OUTPUT = Path(os.environ.get("RSS_OUTPUT", "docs/lunch.xml"))
 
 
 def fetch_menu():
