@@ -1,70 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss version="2.0">
   <channel>
-    <title>Vädret i Själevad</title>
+    <title>Väder i Själevad</title>
     <link>https://www.smhi.se/vader</link>
-    <description>Dagsprognoser för Själevad baserade på SMHI:s öppna väderdata.</description>
+    <description>Temperatur just nu och i morgon kl. 12.00 samt nederbörd. Prognos från SMHI.</description>
     <language>sv-se</language>
-    <lastBuildDate>Tue, 27 Oct 2026 10:11:06 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 27 Oct 2026 10:25:26 +0000</lastBuildDate>
     <item>
-      <title>Väder i Själevad – Tuesday 27 October 2026</title>
-      <description>Temperatur: 7.9 till 9.7 °C | Vind: som mest 5.1 m/s | Sannolikhet för nederbörd: som högst 80 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-10-27</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
+      <title>☁️ Just nu – 7.9 °C</title>
+      <description>🌡️ Temperatur: 7.9 °C. 🌧️ Nederbörd: 0.0 mm per prognosperiod. Väder: Mulet. Prognostid: 2026-10-27 12:00. Källa: SMHI.</description>
+      <guid isPermaLink="false">sjalevad-just-nu-2026-10-27</guid>
+      <pubDate>Tue, 27 Oct 2026 11:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>Väder i Själevad – Wednesday 28 October 2026</title>
-      <description>Temperatur: 1.6 till 11.8 °C | Vind: som mest 3.6 m/s | Sannolikhet för nederbörd: som högst 73 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-10-28</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Thursday 29 October 2026</title>
-      <description>Temperatur: 1.4 till 7.5 °C | Vind: som mest 5.5 m/s | Sannolikhet för nederbörd: som högst 6 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-10-29</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Friday 30 October 2026</title>
-      <description>Temperatur: 6.0 till 10.3 °C | Vind: som mest 6.4 m/s | Sannolikhet för nederbörd: som högst 12 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-10-30</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Saturday 31 October 2026</title>
-      <description>Temperatur: 1.0 till 6.2 °C | Vind: som mest 3.3 m/s | Sannolikhet för nederbörd: som högst 4 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-10-31</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Sunday 01 November 2026</title>
-      <description>Temperatur: 2.6 till 4.5 °C | Vind: som mest 4.1 m/s | Sannolikhet för nederbörd: som högst 25 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-11-01</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Monday 02 November 2026</title>
-      <description>Temperatur: 1.4 till 5.7 °C | Vind: som mest 4.4 m/s | Sannolikhet för nederbörd: som högst 23 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-11-02</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Tuesday 03 November 2026</title>
-      <description>Temperatur: 5.0 till 7.1 °C | Vind: som mest 5.7 m/s | Sannolikhet för nederbörd: som högst 18 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-11-03</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Wednesday 04 November 2026</title>
-      <description>Temperatur: 3.4 till 5.7 °C | Vind: som mest 4.8 m/s | Sannolikhet för nederbörd: som högst 8 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-11-04</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
-    </item>
-    <item>
-      <title>Väder i Själevad – Thursday 05 November 2026</title>
-      <description>Temperatur: 2.9 till 5.4 °C | Vind: som mest 4.7 m/s | Sannolikhet för nederbörd: som högst 13 %</description>
-      <guid isPermaLink="false">sjalevad-weather-2026-11-05</guid>
-      <pubDate>Tue, 27 Oct 2026 10:11:06 +0000</pubDate>
+      <title>☀️ Imorgon kl. 12.00 – 11.6 °C</title>
+      <description>🌡️ Temperatur: 11.6 °C. 🌧️ Nederbörd: 0.0 mm per prognosperiod. Väder: Klart. Prognostid: 2026-10-28 12:00. Källa: SMHI.</description>
+      <guid isPermaLink="false">sjalevad-imorgon-kl.-12.00-2026-10-27</guid>
+      <pubDate>Wed, 28 Oct 2026 11:00:00 +0000</pubDate>
     </item>
   </channel>
 </rss>
