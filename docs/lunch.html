@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dagens lunch</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    #lunch {
+      font-size: 18px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Dagens lunch:</h1>
+  <div id="lunch">Hämtar dagens lunch ...</div>
+
+  <script>
+    async function loadLunch() {
+      const output = document.getElementById("lunch");
+
+      try {
+        const response = await fetch("lunch.xml");
+
+        if (!response.ok) {
+          throw new Error("Kunde inte hämta lunchflödet.");
+        }
+
+        const xmlText = await response.text();
+        const xml = new DOMParser().parseFromString(
+          xmlText,
+          "application/xml"
+        );
+
+        if (xml.querySelector("parsererror")) {
+          throw new Error("Lunchflödet innehåller ogiltig XML.");
+        }
+
+        const item = xml.querySelector("channel > item");
+
+        if (!item) {
+          throw new Error("Ingen lunch hittades.");
+        }
+
+        const description =
+          item.querySelector("description")?.textContent?.trim();
+
+        if (!description) {
+          throw new Error("Lunchmenyn är tom.");
+        }
+
+        output.textContent = description;
+      } catch (error) {
+        output.textContent =
+          "Dagens lunch kunde inte hämtas just nu.";
+      }
+    }
+
+    loadLunch();
+  </script>
+</body>
+</html>
