@@ -138,8 +138,7 @@ def make_feed(forecast):
         ET.SubElement(item, "title").text = f"{emoji} {label} – {temperature}"
 
 
-        weather_description = f"{description} · {temperature}"
-
+        weather_description = description
 
         ET.SubElement(item, "description").text = weather_description
 
