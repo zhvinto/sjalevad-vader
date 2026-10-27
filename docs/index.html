@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Väder i Själevad</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    .weather-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid #dddddd;
+    }
+
+    .symbol {
+      font-size: 48px;
+    }
+
+    .details h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .temperature {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 6px;
+    }
+
+    .description {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .note {
+      color: #555555;
+      font-size: 13px;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Väder i Själevad</h1>
+
+  <div id="weather">
+    Hämtar väderprognosen ...
+  </div>
+
+  <p class="note">Prognos från SMHI</p>
+
+  <script>
+    async function loadWeather() {
+      const container = document.getElementById("weather");
+
+      try {
+        const response = await fetch("feed.xml");
+        if (!response.ok) {
+          throw new Error("Kunde inte hämta RSS-flödet.");
+        }
+
+        const xmlText = await response.text();
+        const xml = new DOMParser().parseFromString(
+          xmlText, "application/xml"
+        );
+
+        if (xml.querySelector("parsererror")) {
+          throw new Error("RSS-filen kunde inte läsas.");
+        }
+
+        const items = [...xml.querySelectorAll("channel > item")];
+        container.replaceChildren();
+
+        for (const item of items) {
+          const title = item.querySelector("title")?.textContent || "";
+          const description =
+            item.querySelector("description")?.textContent || "";
+
+          const match = title.match(
+            /^(.*?)\s*(Idag|Imorgon)\s*[–-]\s*(.+)$/
+          );
+
+          if (!match) continue;
+
+          const symbol = match[1].trim();
+          const day = match[2];
+          const temperature = match[3].trim();
+
+          const card = document.createElement("section");
+          card.className = "weather-card";
+
+          const icon = document.createElement("div");
+          icon.className = "symbol";
+          icon.textContent = symbol;
+
+          const details = document.createElement("div");
+          details.className = "details";
+
+          const heading = document.createElement("h2");
+          heading.textContent = day;
+
+          const temp = document.createElement("p");
+          temp.className = "temperature";
+          temp.textContent = temperature;
+
+          const desc = document.createElement("p");
+          desc.className = "description";
+          desc.textContent = description;
+
+          details.append(heading, temp, desc);
+          card.append(icon, details);
+          container.append(card);
+        }
+
+        if (!container.children.length) {
+          container.textContent =
+            "Hittade inga väderuppgifter i RSS-flödet.";
+        }
+      } catch (error) {
+        container.textContent =
+          "Kunde inte hämta vädret. Försök igen senare.";
+      }
+    }
+
+    loadWeather();
+  </script>
+</body>
+</html>
