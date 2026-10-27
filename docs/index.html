@@ -113,9 +113,12 @@
           const heading = document.createElement("h2");
           heading.textContent = day;
 
-          const temp = document.createElement("p");
-          temp.className = "temperature";
-          temp.textContent = temperature;
+const temp = document.createElement("p");
+temp.className = "temperature";
+temp.textContent = temperature.replace(
+  /-?\d+(?:[.,]\d+)?/,
+  value => String(Math.round(Number(value.replace(",", "."))))
+);
 
           const desc = document.createElement("p");
           desc.className = "description";
