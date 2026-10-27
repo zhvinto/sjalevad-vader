@@ -116,10 +116,8 @@ def make_feed(forecast):
     ET.SubElement(channel, "language").text = "sv-se"
     ET.SubElement(channel, "lastBuildDate").text = format_datetime(now)
 
-    entries = [
-        ("Just nu", current_point),
-        ("Imorgon kl. 12.00", tomorrow_point),
-    ]
+
+    entries = [("Idag", current_point), ("Imorgon", tomorrow_point)]
 
     for label, point in entries:
         if point is None:
@@ -127,9 +125,6 @@ def make_feed(forecast):
 
         timestamp, data = point
         temp = valid_number(data.get("air_temperature"))
-        rain = valid_number(
-            data.get("precipitation_amount_mean_deterministic")
-        )
         symbol_code = valid_number(data.get("symbol_code"))
 
         emoji, description = WEATHER.get(
@@ -137,31 +132,23 @@ def make_feed(forecast):
             ("🌡️", "Väderprognos")
         )
 
-        temperature = (
-            f"{temp:.1f} °C" if temp is not None else "Uppgift saknas"
-        )
-        precipitation = (
-            f"{max(0, rain):.1f} mm per prognosperiod"
-            if rain is not None else "Uppgift saknas"
-        )
+        temperature = f"{temp:.1f} °C" if temp is not None else "Uppgift saknas"
 
         item = ET.SubElement(channel, "item")
-        ET.SubElement(item, "title").text = (
-            f"{emoji} {label} – {temperature}"
-        )
-        ET.SubElement(item, "description").text = (
-            f"🌡️ Temperatur: {temperature}. "
-            f"🌧️ Nederbörd: {precipitation}. "
-            f"Väder: {description}. "
-            f"Prognostid: "
-            f"{timestamp.astimezone(TZ).strftime('%Y-%m-%d %H:%M')}. "
-            "Källa: SMHI."
-        )
+        ET.SubElement(item, "title").text = f"{emoji} {label} – {temperature}"
+
+        if label == "Imorgon":
+            weather_description = f"{description} · Temperatur kl. 12.00: {temperature}"
+        else:
+            weather_description = f"{description} · Nuvarande temperatur: {temperature}"
+
+        ET.SubElement(item, "description").text = weather_description
+
         ET.SubElement(item, "guid", isPermaLink="false").text = (
-            f"sjalevad-{label.lower().replace(' ', '-')}-"
-            f"{today.isoformat()}"
+            f"sjalevad-{label.lower()}-{today.isoformat()}"
         )
         ET.SubElement(item, "pubDate").text = format_datetime(timestamp)
+
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     tree = ET.ElementTree(root)
