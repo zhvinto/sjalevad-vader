@@ -39,9 +39,10 @@
       const output = document.getElementById("lunch");
 
       try {
-       const response = await fetch("lunch.xml", {
-  cache: "no-cache"
-});
+const response = await fetch(
+  "lunch.xml?t=" + Date.now(),
+  { cache: "no-store" }
+);
 
         if (!response.ok) {
           throw new Error("Kunde inte hämta lunchflödet.");
