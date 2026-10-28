@@ -106,3 +106,14 @@ def create_rss(dishes):
     )
 
     print("RSS uppdaterat:", OUTPUT)
+
+if __name__ == "__main__":
+    today = datetime.now(TIMEZONE).date()
+    print("Dagens datum:", today)
+
+    meals = fetch_menu()
+    dishes = get_todays_dishes(meals)
+
+    print("Hittade rätter:", dishes)
+
+    create_rss(dishes)
