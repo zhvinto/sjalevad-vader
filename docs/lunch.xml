@@ -3,16 +3,13 @@
   <channel>
     <title>Dagens lunch</title>
     <link>https://menu.matildaplatform.com/meals/week/68b52fddced7b30d63498017_sjalevadskolan</link>
-    <description>Dagens lunchmeny.</description>
-    <language>sv-se</language>
-    <lastBuildDate>Tue, 27 Oct 2026 12:30:35 +0100</lastBuildDate>
+    <description>Dagens lunch</description>
     <item>
-      <title>Dagens lunch 2026-10-27</title>
-      <description>Morotsbollar med pasta och tomatsås
-Kycklingköttbullar, pasta, tomatsås</description>
+      <title>Dagens lunch:</title>
+      <description>Grönsaksbiff Caribbean, sås och potatis
+Fiskpudding med kokt potatis och skirat smör</description>
       <link>https://menu.matildaplatform.com/meals/week/68b52fddced7b30d63498017_sjalevadskolan</link>
-      <guid isPermaLink="false">dagens-lunch-2026-10-27</guid>
-      <pubDate>Tue, 27 Oct 2026 12:30:35 +0100</pubDate>
+      <guid isPermaLink="false">dagens-lunch-2026-10-28</guid>
     </item>
   </channel>
 </rss>
