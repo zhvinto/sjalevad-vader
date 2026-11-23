@@ -5,15 +5,15 @@
     <link>https://www.smhi.se/vader</link>
     <description>Temperatur just nu och i morgon kl. 12.00 samt nederbörd. Prognos från SMHI.</description>
     <language>sv-se</language>
-    <lastBuildDate>Sun, 22 Nov 2026 23:51:13 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 23 Nov 2026 01:23:21 +0000</lastBuildDate>
     <item>
-      <title>☀️ Idag – -1.6 °C</title>
-      <description>Klart</description>
+      <title>🌤️ Idag – -2.4 °C</title>
+      <description>Växlande molnighet</description>
       <guid isPermaLink="false">sjalevad-idag-2026-11-23</guid>
-      <pubDate>Mon, 23 Nov 2026 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 23 Nov 2026 02:00:00 +0000</pubDate>
     </item>
     <item>
-      <title>☀️ Imorgon – -2.7 °C</title>
+      <title>☀️ Imorgon – -2.8 °C</title>
       <description>Klart</description>
       <guid isPermaLink="false">sjalevad-imorgon-2026-11-23</guid>
       <pubDate>Tue, 24 Nov 2026 11:00:00 +0000</pubDate>
